@@ -7,6 +7,7 @@ Useful for quick sharing. Not suitable for public hosting over the internet.
 package main
 
 import (
+	"bufio"
 	"flag"
 	"fmt"
 	"log"
@@ -15,6 +16,8 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
+	"strings"
+	"unicode/utf8"
 )
 
 const (
@@ -25,9 +28,10 @@ const (
 )
 
 var (
-	version  = flag.Bool("version", false, "print version info and exit")
-	addr     = flag.String("addr", ":8080", "address to start the server on")
-	password = flag.String("password", "", "require basic authentication password")
+	version        = flag.Bool("version", false, "print version info and exit")
+	addr           = flag.String("addr", ":8080", "address to start the server on")
+	password       = flag.String("password", "", "require basic authentication password")
+	promptPassword = flag.Bool("promptPassword", false, "prompt for password to enter in the console if you don't want to provide with -password")
 )
 
 func main() {
@@ -37,6 +41,17 @@ func main() {
 	if *version {
 		printVersion()
 		return
+	}
+
+	if *promptPassword {
+		fmt.Print("Enter basic authentication password: ")
+		scanner := bufio.NewScanner(os.Stdout)
+		scanner.Scan()
+		*password = scanner.Text()
+	}
+
+	if *password != "" {
+		log.Print("Using basic auth password ", strings.Repeat("*", utf8.RuneCountInString(*password)))
 	}
 
 	args := flag.Args()
