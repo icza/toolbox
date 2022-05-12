@@ -19,14 +19,15 @@ import (
 
 const (
 	appName    = "servefolder"
-	appVersion = "v0.1.0"
+	appVersion = "v0.2.0"
 	appAuthor  = "Andras Belicza"
 	appHome    = "https://github.com/icza/toolbox"
 )
 
 var (
-	version = flag.Bool("version", false, "print version info and exit")
-	addr    = flag.String("addr", ":8080", "address to start the server on")
+	version  = flag.Bool("version", false, "print version info and exit")
+	addr     = flag.String("addr", ":8080", "address to start the server on")
+	password = flag.String("password", "", "require basic authentication password")
 )
 
 func main() {
@@ -67,8 +68,26 @@ func main() {
 		printLocalInterfaces(port)
 	}
 
-	http.Handle("/", http.FileServer(http.Dir(path)))
+	root := http.FileServer(http.Dir(path))
+	if *password != "" {
+		root = basicAuth(root)
+	}
+
+	http.Handle("/", root)
 	log.Print(http.ListenAndServe(*addr, nil))
+}
+
+func basicAuth(h http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if _, pass, ok := r.BasicAuth(); !ok || // Missing / invalid basic auth
+			pass != *password { // Invalid password
+			w.Header().Set("WWW-Authenticate", `Basic realm="servefolder"`)
+			http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
+			return
+		}
+
+		h.ServeHTTP(w, r)
+	})
 }
 
 func printLocalInterfaces(port string) {
