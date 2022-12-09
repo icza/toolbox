@@ -1,8 +1,6 @@
 /*
-
-This app serves a folder via HTTP.
+This app shares a folder via HTTP.
 Useful for quick sharing. Not suitable for public hosting over the internet.
-
 */
 package main
 
@@ -21,7 +19,7 @@ import (
 )
 
 const (
-	appName    = "servefolder"
+	appName    = "sharefolder"
 	appVersion = "v0.2.0"
 	appAuthor  = "Andras Belicza"
 	appHome    = "https://github.com/icza/toolbox"
@@ -67,7 +65,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	log.Printf("Serving folder: %s", path)
+	log.Printf("Sharing folder: %s", path)
 
 	// Find out and print which addresses we're listening on:
 	host, port, err := net.SplitHostPort(*addr)
@@ -96,7 +94,7 @@ func basicAuth(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if _, pass, ok := r.BasicAuth(); !ok || // Missing / invalid basic auth
 			pass != *password { // Invalid password
-			w.Header().Set("WWW-Authenticate", `Basic realm="servefolder"`)
+			w.Header().Set("WWW-Authenticate", `Basic realm="sharefolder"`)
 			http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
 			return
 		}
@@ -140,8 +138,8 @@ func printVersion() {
 func printUsage() {
 	fmt.Println("Usage:")
 	name := os.Args[0]
-	fmt.Printf("%s [FLAGS] [folder-to-serve]\n", name)
-	fmt.Println("(The current working directory is served if not specified.)")
+	fmt.Printf("%s [FLAGS] [folder-to-share]\n", name)
+	fmt.Println("(The current working directory is shared if not specified.)")
 	fmt.Println()
 	fmt.Println("Flags:")
 
