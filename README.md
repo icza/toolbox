@@ -15,4 +15,4 @@ Then run (Go 1.18 or higher is recommended):
 
 ## List of apps
 
-- [`servefolder`](https://github.com/icza/toolbox/tree/main/cmd/servefolder): serve a folder via HTTP, useful for quick sharing
+- [`sharefolder`](https://github.com/icza/toolbox/tree/main/cmd/sharefolder): share a folder via HTTP, useful for quick sharing
