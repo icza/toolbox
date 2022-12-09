@@ -1,4 +1,4 @@
-# servefolder
+# sharefolder
 
 This app shares a folder via HTTP.
 
